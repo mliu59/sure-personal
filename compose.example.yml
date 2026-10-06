@@ -90,8 +90,15 @@ services:
       # Localhost only. Use "${PORT:-3000}:3000" instead to expose on your LAN.
       - "127.0.0.1:${PORT:-3000}:3000"
     restart: unless-stopped
+    # Pass every .env variable (e.g. provider credentials like SNAPTRADE_*)
+    # into the app; values under `environment` below take precedence.
+    env_file:
+      - path: .env
+        required: false
     environment:
       <<: *rails_env
+      # .env's PORT is the host port; the app always listens on 3000 in the container.
+      PORT: "3000"
       # BINDING: "::"  # Uncomment for IPv6 dual-stack inside the container
     depends_on:
       db:
@@ -110,6 +117,9 @@ services:
     volumes:
       - app-storage:/rails/storage
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
     depends_on:
       db:
         condition: service_healthy
